@@ -1,1 +1,1 @@
-# static-web-ui
+# The Stacks - static-web-ui
