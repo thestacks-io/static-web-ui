@@ -32,10 +32,14 @@ Parameters:
     Type: String
     Description: Domain name for your ui (example.com)
     Default: ''
-  Redirect:
+  RedirectWWW:
     Type: String
     Description: Redirect domain name for your ui (www.example.com)
-    Default: ''
+    Default: 'true'
+  Protocol:
+    Type: String
+    Description: HTTP or HTTPS
+    Default: 'HTTP'
 
 Resources:
 
@@ -212,7 +216,7 @@ Resources:
                 Version: 1
                 Provider: CloudFormation
               Configuration:
-                TemplatePath: "GitSource::stack.yml"
+                TemplatePath: "GitSource::stacks/ui.stack.yml"
                 ActionMode: CREATE_UPDATE
                 Capabilities: CAPABILITY_NAMED_IAM
                 RoleArn: !GetAtt CloudFormationRole.Arn
@@ -221,7 +225,8 @@ Resources:
                   {
                     "Domain": "${Domain}",
                     "TLD" : "${TLD}",
-                    "Redirect" : "${Redirect}"
+                    "RedirectWWW" : "${RedirectWWW}",
+                    "Protocol" : "${Protocol}"
                   }
               RunOrder: 1
             - Name: Deploy

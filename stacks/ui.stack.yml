@@ -11,13 +11,18 @@ Parameters:
   Domain:
     Type: String
     Description: Domain name for your website (example.com)
-  Redirect:
+  RedirectWWW:
     Type: String
     Description: Redirect to Domain (www.example.com redirects to example.com)
-    Default: ''
+    Default: 'true'
+  Protocol:
+    Type: String
+    Description: HTTP or HTTPS
+    Default: 'HTTP'
 
 Conditions:
-  NeedsRedirect: !Not [!Equals [!Ref Redirect, '']]
+  NeedsRedirect: !Not [!Equals [!Ref RedirectWWW, 'true']]
+  IsHTTPS: !Not [!Equals [!Ref Protocol, 'HTTPS']]
 
 
 #
@@ -41,7 +46,7 @@ Resources:
     Type: AWS::S3::Bucket
     Condition: NeedsRedirect
     Properties:
-      BucketName: !Ref Redirect
+      BucketName: !Sub 'www.${Domain}'
       AccessControl: BucketOwnerFullControl
       WebsiteConfiguration:
         RedirectAllRequestsTo:
@@ -52,6 +57,7 @@ Resources:
   #
   SSL:
     Type: AWS::CertificateManager::Certificate
+    Condition: IsHTTPS
     Properties:
       DomainName: !Ref Domain
       DomainValidationOptions:
@@ -69,40 +75,9 @@ Resources:
           - !Ref Domain
         Enabled: true
         PriceClass: 'PriceClass_All'
-        CacheBehaviors:
-          -
-            TargetOriginId: !Ref WebsiteBucket
-            PathPattern: '*.js'
-            ViewerProtocolPolicy: 'redirect-to-https'
-            MinTTL: 0
-            AllowedMethods:
-              - 'HEAD'
-              - 'GET'
-            CachedMethods:
-              - 'HEAD'
-              - 'GET'
-            ForwardedValues:
-              QueryString: true
-              Cookies:
-                Forward: 'none'
-          -
-            TargetOriginId: !Ref WebsiteBucket
-            PathPattern: '*.css'
-            ViewerProtocolPolicy: 'redirect-to-https'
-            MinTTL: 0
-            AllowedMethods:
-              - 'HEAD'
-              - 'GET'
-            CachedMethods:
-              - 'HEAD'
-              - 'GET'
-            ForwardedValues:
-              QueryString: true
-              Cookies:
-                Forward: 'none'
         DefaultCacheBehavior:
           TargetOriginId: !Ref WebsiteBucket
-          ViewerProtocolPolicy: 'redirect-to-https'
+          ViewerProtocolPolicy: Fn::If: [IsHTTPS, 'redirect-to-https', 'allow-all']
           MinTTL: 0
           AllowedMethods:
             - 'HEAD'
@@ -117,13 +92,7 @@ Resources:
         Origins:
           -
             Id: !Ref WebsiteBucket
-            DomainName:
-              Fn::Join:
-                - ''
-                - - !Ref Domain
-                  - '.s3-website-'
-                  - !Ref AWS::Region
-                  - '.amazonaws.com'
+            DomainName: !Sub '${Domain}.s3-website-${AWS::Region}.amazonaws.com'
             CustomOriginConfig:
               HTTPPort: 80
               HTTPSPort: 443
@@ -134,7 +103,8 @@ Resources:
         ViewerCertificate:
           SslSupportMethod: 'sni-only'
           MinimumProtocolVersion: 'TLSv1'
-          AcmCertificateArn: !Ref SSL
+          AcmCertificateArn: Fn::If: [IsHTTPS, !Ref SSL, null]
+          CloudFrontDefaultCertificate: Fn::If: [IsHTTPS, false, true]
 
   #
   # Route53 DNS record set to map our domain to our CDN
@@ -142,11 +112,7 @@ Resources:
   DomainDNS:
     Type: AWS::Route53::RecordSetGroup
     Properties:
-      HostedZoneName:
-        Fn::Join:
-          - ''
-          - - !Ref TLD
-            - '.'
+      HostedZoneName: !Sub '${TLD}.'
       RecordSets:
         -
           Name: !Ref Domain
@@ -162,22 +128,12 @@ Resources:
     Type: AWS::Route53::RecordSet
     Condition: NeedsRedirect
     Properties:
-      HostedZoneName:
-        Fn::Join:
-          - ''
-          - - !Ref TLD
-            - '.'
-      Name: !Ref Redirect
+      HostedZoneName: !Sub '${TLD}.'
+      Name: !Sub 'www.${Domain}'
       Type: 'CNAME'
       TTL: 900
       ResourceRecords:
-        -
-          Fn::Join:
-            - ''
-            - - !Ref Domain
-              - '.s3-website-'
-              - !Ref AWS::Region
-              - '.amazonaws.com'
+        - !Sub 'www.${Domain}.s3-website-${AWS::Region}.amazonaws.com'
 
 #
 # Outputs to be used by other CloudFormation templates if needed.

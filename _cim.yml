@@ -1,6 +1,6 @@
 version: 0.1
 stack:
-  name: thestacks-ui-pipeline-prod # Note: Update this with your stack name
+  name: fnci-pipeline-prod # Note: Update this with your stack name
   template:
     file: pipeline.yml
     bucket: cim-stack-artifacts # Note: Update this with your bucket name.  Stacks are uploaded here prior to deployment.'
@@ -9,9 +9,8 @@ stack:
   # Define stack input parameters.
   #
   parameters:
-    TLD: 'thestacks.io'
-    Domain: 'thestacks.io'
-    Redirect: 'www.thestacks.io'
+    TLD: 'fnci.io'
+    Domain: 'fnci.io'
     # CI/CD
     GitHubToken: '${kms.decrypt(AQICAHgiu9XuQb4FZRXrLn/77g1P99ZhS7/g3xOsvbvNpb+/qQH+sxP+if0SN0/QR0I3M9ehAAAAhzCBhAYJKoZIhvcNAQcGoHcwdQIBADBwBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDNTJCu1YrFM64MUL4AIBEIBD8zDL0Oc+8rQwr/7fJq+NyPB7vKJ/lNqqcmBBN9QS8XDFAqB9Vh9fkCUSilXs3HG3NL6EdLYaR9Z5blo7p2/HTmJrnw==)}'
 
@@ -30,11 +29,11 @@ stack:
 stage:
   dev:
     stack:
-      name: thestacks-ui-pipeline-dev
+      name: fnci-pipeline-dev
       parameters:
         Environment: 'dev'
         Domain: 'dev.thestacks.io'
-        Redirect: ''
+        RedirectWWW: 'false'
         # CI/CD
         GitHubBranch: 'develop'
 
