@@ -21,8 +21,8 @@ Parameters:
     Default: 'HTTP'
 
 Conditions:
-  NeedsRedirect: !Not [!Equals [!Ref RedirectWWW, 'true']]
-  IsHTTPS: !Not [!Equals [!Ref Protocol, 'HTTPS']]
+  NeedsRedirect: !Equals [!Ref RedirectWWW, 'true']
+  IsHTTPS: !Equals [!Ref Protocol, 'HTTPS']
 
 
 #
