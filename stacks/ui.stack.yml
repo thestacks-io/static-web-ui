@@ -104,7 +104,7 @@ Resources:
           SslSupportMethod: !If [IsHTTPS, "sni-only", !Ref "AWS::NoValue"]
           MinimumProtocolVersion: !If [IsHTTPS, "TLSv1", !Ref "AWS::NoValue"]
           AcmCertificateArn: !If [IsHTTPS, !Ref SSL, !Ref "AWS::NoValue"]
-          CloudFrontDefaultCertificate: !If [IsHTTPS, false, true]
+          CloudFrontDefaultCertificate: !If [IsHTTPS, !Ref "AWS::NoValue", true]
 
   #
   # Route53 DNS record set to map our domain to our CDN
