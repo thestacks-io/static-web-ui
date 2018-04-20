@@ -77,7 +77,7 @@ Resources:
         PriceClass: 'PriceClass_All'
         DefaultCacheBehavior:
           TargetOriginId: !Ref WebsiteBucket
-          ViewerProtocolPolicy: Fn::If: [IsHTTPS, 'redirect-to-https', 'allow-all']
+          ViewerProtocolPolicy: !If [IsHTTPS, "redirect-to-https", "allow-all"]
           MinTTL: 0
           AllowedMethods:
             - 'HEAD'
@@ -103,8 +103,8 @@ Resources:
         ViewerCertificate:
           SslSupportMethod: 'sni-only'
           MinimumProtocolVersion: 'TLSv1'
-          AcmCertificateArn: Fn::If: [IsHTTPS, !Ref SSL, null]
-          CloudFrontDefaultCertificate: Fn::If: [IsHTTPS, false, true]
+          AcmCertificateArn: !If [IsHTTPS, !Ref SSL, !Ref "AWS::NoValue"]
+          CloudFrontDefaultCertificate: !If [IsHTTPS, false, true]
 
   #
   # Route53 DNS record set to map our domain to our CDN

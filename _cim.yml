@@ -9,6 +9,8 @@ stack:
   # Define stack input parameters.
   #
   parameters:
+    GitHubOwner: 'thestacks-io'
+    GitHubRepo: 'static-web-ui'
     TLD: 'fnci.io'
     Domain: 'fnci.io'
     # CI/CD
