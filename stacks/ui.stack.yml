@@ -101,8 +101,8 @@ Resources:
           GeoRestriction:
             RestrictionType: 'none'
         ViewerCertificate:
-          SslSupportMethod: 'sni-only'
-          MinimumProtocolVersion: 'TLSv1'
+          SslSupportMethod: !If [IsHTTPS, "sni-only", !Ref "AWS::NoValue"]
+          MinimumProtocolVersion: !If [IsHTTPS, "TLSv1", !Ref "AWS::NoValue"]
           AcmCertificateArn: !If [IsHTTPS, !Ref SSL, !Ref "AWS::NoValue"]
           CloudFrontDefaultCertificate: !If [IsHTTPS, false, true]
 
