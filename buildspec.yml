@@ -1,3 +1,6 @@
+#
+# AWS CodeBuild spec, https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html#build-spec-ref-syntax
+#
 version: 0.1
 phases:
   install:
@@ -6,6 +9,9 @@ phases:
     commands:
   build:
     commands:
+      #
+      # Uploads all www/* files to S3.
+      #
       - aws s3 sync www "s3://$(aws cloudformation describe-stacks --stack-name ${StackName} --query "Stacks[0].Outputs[0].OutputValue" --output text)" --acl bucket-owner-full-control --acl public-read --delete --cache-control "max-age=1"
   post_build:
     commands:
