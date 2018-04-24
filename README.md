@@ -7,11 +7,6 @@ The continuous deployment is done by AWS CodePipeline and CodeBuild via the buil
 
 Take a look at the buildspec.yml file.  https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html#build-spec-ref-syntax
 
-### How do I deploy a `dev` environment?
-A `dev` environment is a clone of this entire pipeline and stack but hooked up to your `develop` Github branch.
-
-This way you can code against the `develop` branch and view your changes online.  Then merge with `master` when you're ready to release to production. 
-
 ### How do I enable SSL (https)?
 Update the pipeline CloudFormation stack and set the `Protocal` input parameter to `HTTPS`.  
 
