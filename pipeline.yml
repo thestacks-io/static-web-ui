@@ -163,7 +163,7 @@ Resources:
         Type: LINUX_CONTAINER
         EnvironmentVariables:
           - Name: StackName
-            Value: !Sub "${AppName}-static-web-ui-${Environment}"
+            Value: !Sub "${AppName}-website-${Environment}"
       Name: !Sub '${AppName}-code-build-${Environment}'
       ServiceRole: !GetAtt CodeBuildRole.Arn
       Source:
